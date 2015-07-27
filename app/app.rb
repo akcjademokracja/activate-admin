@@ -6,8 +6,16 @@ module ActivateAdmin
     helpers Activate::DatetimeHelpers
     helpers Activate::ParamHelpers
     helpers Activate::NavigationHelpers
-      
+    
     enable :sessions
+    if ENV['SSL']
+      use Rack::SslEnforcer
+      use Rack::Session::Cookie, :key => '_rack_session', :path => '/', :expire_after => 30*24*60*60, :secret => ENV['SESSION_SECRET']
+      config.middleware.use Rack::SslEnforcer
+    else
+      set :sessions, :expire_after => 1.year    
+    end
+
     set :show_exceptions, true
     set :public_folder,  ActivateAdmin.root('app', 'assets')
     set :default_builder, 'ActivateFormBuilder'
