@@ -181,7 +181,7 @@ module ActivateAdmin
         case content_type
         when :html        
         flash[:notice] = "<strong>Sweet!</strong> The #{human_model_name(model).downcase} was created successfully."      
-        params[:popup] ? '' : redirect(url(:edit, :model => model.to_s, :id => @resource.id))
+        params[:popup] ? closePopup : redirect(url(:edit, :model => model.to_s, :id => @resource.id))
         when :json
           {url: @resource.send(ENV['INLINE_UPLOAD_MODEL_FILE_FIELD']).url}.to_json
         end
@@ -207,7 +207,7 @@ module ActivateAdmin
       instance_variable_set("@#{model.to_s.underscore}", @resource)
       if @resource.update_attributes(params[model.to_s.underscore])
         flash[:notice] = "<strong>Sweet!</strong> The #{human_model_name(model).downcase} was updated successfully."      
-        params[:popup] ? '' : redirect(url(:edit, :model => model.to_s, :id => @resource.id))
+        params[:popup] ? closePopup : redirect(url(:edit, :model => model.to_s, :id => @resource.id))
       else
         flash.now[:error] = "<strong>Oops.</strong> Some errors prevented the #{human_model_name(model).downcase} from being saved."
         erb :build

@@ -80,5 +80,13 @@ ActivateAdmin::App.helpers do
       </script>
     }
   end
+
+  def closePopup
+    %q{
+      <script>
+      window.close();
+      </script>
+    }
+  end
            
 end
