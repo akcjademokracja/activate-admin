@@ -221,11 +221,15 @@ module ActivateAdmin
     get :destroy, :map => '/destroy/:model/:id' do
       resource = model.find(params[:id])
       if resource.destroy
-        flash[:notice] = "<strong>Boom!</strong> The #{human_model_name(model).downcase} was deleted."
+        if !params[:popup] 
+          flash[:notice] = "<strong>Boom!</strong> The #{human_model_name(model).downcase} was deleted."
+        end
       else
-        flash[:error] = "<strong>Darn!</strong> The #{human_model_name(model).downcase} couldn't be deleted."
+        if !params[:popup] 
+          flash[:error] = "<strong>Darn!</strong> The #{human_model_name(model).downcase} couldn't be deleted."
+        end
       end
-      params[:popup] ? refreshParent : redirect(url(:index, :model => model.to_s))
+      params[:popup] ? closePopup : redirect(url(:edit, :model => model.to_s, :id => @resource.id))
     end
     
     get :login, :map => '/login' do
