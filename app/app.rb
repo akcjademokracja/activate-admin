@@ -18,7 +18,10 @@ module ActivateAdmin
     set :show_exceptions, true
     set :public_folder,  ActivateAdmin.root('app', 'assets')
     set :default_builder, 'ActivateFormBuilder'
-       
+    
+    ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
+    ActiveRecord::Base.connection.schema_search_path = ENV['DATABASE_SCHEMA']
+
     before do      
       if ENV['PERMITTED_IPS'] and Padrino.env == :production
         halt 403 unless ENV['PERMITTED_IPS'].split(',').include? request.ip
