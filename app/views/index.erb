@@ -4,22 +4,21 @@
   <a href="<%=url(:new, :model => model.to_s)%>" class="btn btn-primary"><i class="fa fa-pencil"></i>&nbsp;New</a>
 </div>
 
+<%= partial :search %>
+
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-sm-6">
     <p>
       <%= page_entries_info(@resources, :model => model.to_s) %>
-      <a class="btn btn-default" title="Download results as csv" target="_blank" href="<%=url(:index, params.merge(:model => model.to_s, :format => :csv))%>"><i class="fa fa-download"></i></a>
+      <a class="btn btn-default" title="Download results as csv" target="_blank" href="<%=url(:index, params.merge(:format => :csv))%>"><i class="fa fa-download"></i></a>
     </p>    
   </div>
-  <div class="col-md-6" style="text-align: right">
+  <div class="col-sm-6" style="text-align: right">
     <form style="display: inline">      
       <%= search_field_tag :q, :class => 'form-control', :value => @q, :style => 'width: 200px; display: inline' %>
-      <% @f.each { |k,v| %>
-        <%= hidden_field_tag :"f[#{k}]", :value => v %>
-      <% } if @f %>
       <%= hidden_field_tag :o, :value => @o %>
       <%= hidden_field_tag :d, :value => @d %>
-      <%= submit_tag 'Search', :class => 'btn btn-default' %>
+      <button class="btn btn-default"><i class="fa fa-search"></i></button>
 
     </form>    
   </div>
@@ -27,26 +26,19 @@
 
 <style>
   th[data-fieldname] a { color:black; text-decoration: none !important }
-  a.fn, a.odn { visibility:hidden; }
+  a.odn { visibility:hidden; }
 </style>
 <script>
   $(function () {
     var params = $.deparam(location.href.split('?')[1] || '');
     $('th').hover(function () {
-      $('a.fn, a.odn', this).css('visibility', 'visible')
+      $('a.odn', this).css('visibility', 'visible')
     }, function () {
-      $('a.fn, a.odn', this).css('visibility', 'hidden')
+      $('a.odn', this).css('visibility', 'hidden')
     });
     $('a.od').click(function () {
       params['o'] = $(this).closest('th').data('fieldname')
       params['d'] = params['d'] == 'asc' ? 'desc' : 'asc'
-      location.assign(location.pathname + '?' + $.param(params));
-    });
-    $('a.f').click(function () {
-      console.log(this);
-      if (!params['f'])
-        params['f'] = {}
-      params['f'][$(this).closest('th').data('fieldname')] = prompt('Search for:');
       location.assign(location.pathname + '?' + $.param(params));
     });
   });
@@ -73,11 +65,6 @@
             </a>
           <% end %>
 
-          <% if @f and @f[fieldname] %>
-            <a title="Searching for '<%=@f[fieldname]%>'; click to search again" href="javascript:;" class="f"><i class="fa fa-search"></i></a>
-          <% elsif persisted_field?(model, fieldname) and queryable.include?(options[:type]) %>
-            <a title="Search in <%=fieldname%>" href="javascript:;" class="f fn"><i class="fa fa-search"></i></a>
-          <% end %>
         </th>
       <% } %>
       <th style="width: 88px"></th>
@@ -116,7 +103,7 @@
 
 <%= will_paginate @resources, :renderer => WillPaginate::ViewHelpers::BootstrapRenderer %>
 
-<% if @resources.respond_to?(:to_sql) # ActiveRecord/PostgreSQL %>
+<% if active_record? %>
   <pre><%=@resources.to_sql%></pre>
 <% end %>
 
