@@ -37,7 +37,7 @@ module ActivateAdmin
       if ENV['PERMITTED_IPS'] and Padrino.env == :production
         halt 403 unless ENV['PERMITTED_IPS'].split(',').include? request.ip
       end
-      redirect url(:login) unless [url(:login), url(:logout), url(:forgot_password)].any? { |p| p == request.path } or ['stylesheets','javascripts'].any? { |p| request.path.starts_with? "#{ActivateAdmin::App.uri_root}/#{p}" } or Account.count == 0 or (current_account and current_account.admin?)
+      redirect url(:login) + "?redir=#{CGI::escape request.path}" unless [url(:login), url(:logout), url(:forgot_password)].any? { |p| p == request.path } or ['stylesheets','javascripts'].any? { |p| request.path.starts_with? "#{ActivateAdmin::App.uri_root}/#{p}" } or Account.count == 0 or (current_account and current_account.admin?)
       Time.zone = current_account.time_zone if current_account and current_account.respond_to?(:time_zone) and current_account.time_zone
       fix_params!
     end
@@ -389,7 +389,7 @@ module ActivateAdmin
         account = Account.first
         session[:account_id] = account.id
         flash[:notice] = "Logged in successfully."
-        redirect url(:home)
+        redirect params[:redir] or url(:home)
       else
         flash[:error] = "Login or password wrong."
         redirect url(:login)
